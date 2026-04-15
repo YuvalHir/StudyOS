@@ -39,6 +39,27 @@ export async function middleware(request: NextRequest) {
 
   await supabase.auth.getUser();
 
+  // Security Headers
+  supabaseResponse.headers.set('X-Frame-Options', 'DENY');
+  supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff');
+  supabaseResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  supabaseResponse.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  
+  // Strict Content Security Policy (Adjusted for Supabase/Next.js)
+  const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' blob: data: https://*.supabase.co;
+    font-src 'self' data:;
+    connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    frame-ancestors 'none';
+    block-all-mixed-content;
+    upgrade-insecure-requests;
+  `.replace(/\s{2,}/g, ' ').trim();
+  
+  supabaseResponse.headers.set('Content-Security-Policy', cspHeader);
+
   return supabaseResponse;
 }
 
