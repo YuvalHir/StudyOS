@@ -48,10 +48,10 @@ export async function proxy(request: NextRequest) {
   // Relaxed Content Security Policy to allow necessary external resources
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.tailwindcss.com https://polyfill.io;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
     img-src 'self' blob: data: https://*.supabase.co;
-    font-src 'self' data: https://fonts.gstatic.com;
+    font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
     frame-src 'self' blob: data:;
     frame-ancestors 'none';
