@@ -36,9 +36,17 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenResource }) => 
     queryKey: ['dashboard'],
     queryFn: async () => {
       try {
-        // 1. User (Attempt to get, but don't hang if it fails)
-        const { data: userData } = await supabase.auth.getUser();
-        const userName = userData?.user?.email?.split('@')[0] || 'Student';
+        // 1. User Profile
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("No user found");
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+
+        const userName = profile?.full_name || user.email?.split('@')[0] || 'Student';
 
         // 2. Stats
         const { count: coursesCount } = await supabase.from('courses').select('*', { count: 'exact', head: true });

@@ -26,7 +26,9 @@ import {
   LogOut, 
   Menu, 
   X,
-  Bell
+  Bell,
+  Edit2,
+  Check
 } from 'lucide-react';
 
 interface AppClientProps {
@@ -38,6 +40,9 @@ type TabType = 'dashboard' | 'schedule' | 'assignments' | 'resources' | 'courses
 export default function AppClient({ session: initialSession }: AppClientProps) {
   const [session, setSession] = useState<Session | null>(initialSession);
   const [loading, setLoading] = useState(!initialSession);
+  const [fullName, setFullName] = useState<string>('');
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState('');
   const [currentTab, setCurrentTab] = useState<TabType>('dashboard');
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [initialResourceId, setInitialResourceId] = useState<string | null>(null);
@@ -52,7 +57,19 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
     const validateUser = async () => {
       try {
         const { data: { session: currentSession } } = await supabase.auth.getSession();
-        if (currentSession) setSession(currentSession);
+        if (currentSession) {
+          setSession(currentSession);
+          // Fetch profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', currentSession.user.id)
+            .single();
+          
+          const name = profile?.full_name || currentSession.user.email?.split('@')[0] || 'Student';
+          setFullName(name);
+          setNewName(name);
+        }
         else setSession(null);
       } catch (err) {
         setSession(null);
@@ -65,6 +82,12 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
       if (newSession) {
         setSession(newSession);
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', newSession.user.id)
+          .single();
+        setFullName(profile?.full_name || newSession.user.email?.split('@')[0] || 'Student');
       } else {
         setSession(null);
       }
@@ -73,6 +96,24 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const handleUpdateName = async () => {
+    if (!session || !newName.trim()) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ full_name: newName.trim() })
+        .eq('id', session.user.id);
+      
+      if (error) throw error;
+      setFullName(newName.trim());
+      setIsEditingName(false);
+      // Invalidate queries if needed, though here we just update local state for immediate feedback
+    } catch (err) {
+      console.error("Error updating name:", err);
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -209,11 +250,29 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
             )}
 
             <div className="flex items-center gap-3 mb-4 px-1">
-              <div className="w-8 h-8 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 rounded-full border border-black/10 dark:border-white/10"></div>
-              <div className="flex flex-col">
-                <span className="text-[13px] font-bold truncate max-w-[120px]">
-                  {session.user.email?.split('@')[0]}
-                </span>
+              <div className="w-10 h-10 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 rounded-full border border-black/10 dark:border-white/10 flex-shrink-0"></div>
+              <div className="flex flex-col min-w-0 flex-1">
+                {isEditingName ? (
+                  <div className="flex items-center gap-1">
+                    <input 
+                      type="text"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      className="w-full bg-white dark:bg-black/20 border border-system-blue/30 rounded px-1.5 py-0.5 text-[12px] font-bold outline-none"
+                      autoFocus
+                      onKeyDown={(e) => e.key === 'Enter' && handleUpdateName()}
+                    />
+                    <button onClick={handleUpdateName} className="text-green-500 hover:scale-110 transition-transform"><Check size={14} /></button>
+                    <button onClick={() => setIsEditingName(false)} className="text-red-500 hover:scale-110 transition-transform"><X size={14} /></button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 group cursor-pointer" onClick={() => setIsEditingName(true)}>
+                    <span className="text-[14px] font-bold truncate">
+                      {fullName}
+                    </span>
+                    <Edit2 size={10} className="text-foreground/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                )}
                 {mounted && (
                   <span className="text-[10px] text-foreground/30 font-extrabold uppercase tracking-widest uppercase">{t('proPlan')}</span>
                 )}
