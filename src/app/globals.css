@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+:root {
+  --color-system-blue: #007AFF;
+  --color-system-red: #FF3B30;
+  --color-system-green: #34C759;
+  --color-system-gray: #8E8E93;
+  --color-system-background: #FFFFFF;
+  --color-system-secondary: #F2F2F7;
+  --color-system-tertiary: #FFFFFF;
+  
+  --color-foreground: #1D1D1F;
+  --color-background: #F5F5F7;
+  
+  --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-hebrew: "Heebo", sans-serif;
+  --blur-apple: 20px;
+}
+
+.dark {
+  --color-system-background: #1C1C1E;
+  --color-system-secondary: #2C2C2E;
+  --color-system-tertiary: #3A3A3C;
+  --color-background: #000000;
+  --color-foreground: #F5F5F7;
+}
+
+@theme {
+  --color-system-blue: var(--color-system-blue);
+  --color-system-red: var(--color-system-red);
+  --color-system-green: var(--color-system-green);
+  --color-system-gray: var(--color-system-gray);
+  --color-system-background: var(--color-system-background);
+  --color-system-secondary: var(--color-system-secondary);
+  --color-system-tertiary: var(--color-system-tertiary);
+  
+  --color-foreground: var(--color-foreground);
+  --color-background: var(--color-background);
+  
+  --blur-apple: var(--blur-apple);
+}
+
+body {
+  font-family: var(--font-apple);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+}
+
+[dir="rtl"] body {
+  font-family: var(--font-hebrew), var(--font-apple);
+}
+
+/* Apple Design System Utilities */
+.glass {
+  @apply bg-white/70 dark:bg-black/70 backdrop-blur-apple border border-black/[0.08] dark:border-white/[0.08] shadow-sm;
+}
+
+.apple-card {
+  @apply bg-white dark:bg-white/5 rounded-2xl border border-black/[0.05] dark:border-white/[0.05] shadow-[0_2px_10px_rgba(0,0,0,0.04)] transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)];
+}
+
+.apple-button-primary {
+  @apply bg-system-blue text-white rounded-xl px-6 py-2.5 font-semibold transition-all active:scale-95 hover:brightness-110;
+}
+
+.apple-input {
+  @apply bg-black/[0.03] dark:bg-white/5 border border-black/[0.05] dark:border-white/10 rounded-xl px-4 py-3 outline-none focus:bg-white dark:focus:bg-white/10 focus:border-system-blue/50 focus:ring-4 focus:ring-system-blue/10 transition-all text-foreground;
+}
+
+/* Custom Scrollbar for macOS look */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-system-gray/20 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-system-gray/40;
+}
