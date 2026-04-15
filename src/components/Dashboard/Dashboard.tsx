@@ -42,7 +42,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, onOpenResource }) => 
 
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name')
+          .select('full_name, avatar_url')
           .eq('id', user.id)
           .single();
 

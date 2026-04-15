@@ -28,8 +28,7 @@ import {
   Menu, 
   X,
   Bell,
-  Edit2,
-  Check,
+  User,
   Settings as SettingsIcon
 } from 'lucide-react';
 
@@ -43,8 +42,7 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
   const [session, setSession] = useState<Session | null>(initialSession);
   const [loading, setLoading] = useState(!initialSession);
   const [fullName, setFullName] = useState<string>('');
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [newName, setNewName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState<string>('');
   const [currentTab, setCurrentTab] = useState<TabType>('dashboard');
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
   const [initialResourceId, setInitialResourceId] = useState<string | null>(null);
@@ -64,13 +62,13 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
           // Fetch profile
           const { data: profile } = await supabase
             .from('profiles')
-            .select('full_name')
+            .select('full_name, avatar_url')
             .eq('id', currentSession.user.id)
             .single();
           
           const name = profile?.full_name || currentSession.user.email?.split('@')[0] || 'Student';
           setFullName(name);
-          setNewName(name);
+          setAvatarUrl(profile?.avatar_url || '');
         }
         else setSession(null);
       } catch (err) {
@@ -86,10 +84,11 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
         setSession(newSession);
         const { data: profile } = await supabase
           .from('profiles')
-          .select('full_name')
+          .select('full_name, avatar_url')
           .eq('id', newSession.user.id)
           .single();
         setFullName(profile?.full_name || newSession.user.email?.split('@')[0] || 'Student');
+        setAvatarUrl(profile?.avatar_url || '');
       } else {
         setSession(null);
       }
@@ -99,22 +98,9 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleUpdateName = async () => {
-    if (!session || !newName.trim()) return;
-    
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ full_name: newName.trim() })
-        .eq('id', session.user.id);
-      
-      if (error) throw error;
-      setFullName(newName.trim());
-      setIsEditingName(false);
-      // Invalidate queries if needed, though here we just update local state for immediate feedback
-    } catch (err) {
-      console.error("Error updating name:", err);
-    }
+  const handleUpdateProfile = (name: string, avatar?: string) => {
+    setFullName(name);
+    if (avatar) setAvatarUrl(avatar);
   };
 
   const handleLogout = async () => {
@@ -167,7 +153,6 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
     { id: 'schedule', label: t('schedule'), icon: <Calendar size={18} /> },
     { id: 'assignments', label: t('assignments'), icon: <FileText size={18} /> },
     { id: 'resources', label: t('resources'), icon: <Folder size={18} /> },
-    { id: 'settings', label: t('settings'), icon: <SettingsIcon size={18} /> },
   ];
 
   return (
@@ -253,29 +238,28 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
             )}
 
             <div className="flex items-center gap-3 mb-4 px-1">
-              <div className="w-10 h-10 bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 rounded-full border border-black/10 dark:border-white/10 flex-shrink-0"></div>
-              <div className="flex flex-col min-w-0 flex-1">
-                {isEditingName ? (
-                  <div className="flex items-center gap-1">
-                    <input 
-                      type="text"
-                      value={newName}
-                      onChange={(e) => setNewName(e.target.value)}
-                      className="w-full bg-white dark:bg-black/20 border border-system-blue/30 rounded px-1.5 py-0.5 text-[12px] font-bold outline-none"
-                      autoFocus
-                      onKeyDown={(e) => e.key === 'Enter' && handleUpdateName()}
-                    />
-                    <button onClick={handleUpdateName} className="text-green-500 hover:scale-110 transition-transform"><Check size={14} /></button>
-                    <button onClick={() => setIsEditingName(false)} className="text-red-500 hover:scale-110 transition-transform"><X size={14} /></button>
-                  </div>
+              <div className="w-10 h-10 rounded-full border border-black/10 dark:border-white/10 flex-shrink-0 overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="flex items-center gap-1.5 group cursor-pointer" onClick={() => setIsEditingName(true)}>
-                    <span className="text-[14px] font-bold truncate">
-                      {fullName}
-                    </span>
-                    <Edit2 size={10} className="text-foreground/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-full h-full flex items-center justify-center text-foreground/20">
+                    <User size={20} />
                   </div>
                 )}
+              </div>
+              <div className="flex flex-col min-w-0 flex-1">
+                <div className="flex items-center justify-between group">
+                  <span className="text-[14px] font-bold truncate">
+                    {fullName}
+                  </span>
+                  <button 
+                    onClick={() => switchTab('settings')}
+                    className={`p-1.5 rounded-lg transition-all ${currentTab === 'settings' ? 'bg-system-blue text-white' : 'text-foreground/20 hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground'}`}
+                    title={t('settings')}
+                  >
+                    <SettingsIcon size={14} />
+                  </button>
+                </div>
                 {mounted && (
                   <span className="text-[10px] text-foreground/30 font-extrabold uppercase tracking-widest uppercase">{t('proPlan')}</span>
                 )}
@@ -335,8 +319,9 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
             {currentTab === 'settings' && (
               <Settings 
                 fullName={fullName} 
+                avatarUrl={avatarUrl}
                 email={session.user.email || ''} 
-                onUpdateProfile={(name) => setFullName(name)} 
+                onUpdateProfile={handleUpdateProfile} 
               />
             )}
           </div>
