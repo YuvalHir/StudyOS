@@ -25,7 +25,6 @@ import {
   Sun, 
   Moon, 
   LogOut, 
-  Menu, 
   X,
   Bell,
   User,
@@ -172,13 +171,19 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
               <Bell size={20} className="text-foreground/40" />
               <span className="absolute top-2 right-2 w-2 h-2 bg-system-red rounded-full border-2 border-system-tertiary"></span>
             </button>
-            <QuickActions onAction={handleQuickAction} />
-            <button 
-              className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            
+            <div 
+              className="w-8 h-8 rounded-full border border-black/10 dark:border-white/10 overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 cursor-pointer"
               onClick={() => setIsMobileMenuOpen(true)}
             >
-              <Menu size={24} />
-            </button>
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-foreground/20">
+                  <User size={16} />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -305,6 +310,19 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
               <Bell size={20} className="text-foreground/40 group-hover:text-foreground transition-colors" />
               <span className="absolute top-2.5 end-2.5 w-2 h-2 bg-system-red rounded-full border-2 border-system-tertiary"></span>
             </button>
+            
+            <div 
+              className="w-10 h-10 rounded-full border border-black/10 dark:border-white/10 overflow-hidden bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800 cursor-pointer hover:scale-105 transition-all shadow-lg"
+              onClick={() => switchTab('settings')}
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-foreground/20">
+                  <User size={20} />
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="p-4 md:p-8 max-w-[1400px] mx-auto animate-in fade-in duration-1000">
