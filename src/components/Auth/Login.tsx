@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/Button';
 import { supabase } from '@/utils/supabase/client';
 import { Quote, Book, Calendar, CheckSquare, Sparkles, ArrowLeft, Mail, Lock, User, GraduationCap, Languages } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const Login: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -212,6 +211,11 @@ const Login: React.FC = () => {
             transition={{ delay: 0.2, duration: 0.6 }}
             className="bg-[#d4d4d4] rounded-[2rem] p-6 xl:p-8 shadow-2xl relative overflow-hidden text-slate-900"
           >
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border-l-4 border-red-500 text-red-700 text-xs font-bold rounded">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 relative z-10">
               {isSignUp && (
                 <div className="relative group">
