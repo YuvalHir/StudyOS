@@ -38,6 +38,10 @@
   --color-foreground: var(--color-foreground);
   --color-background: var(--color-background);
   
+  --background-color-system-background: var(--color-system-background);
+  --background-color-system-secondary: var(--color-system-secondary);
+  --background-color-system-tertiary: var(--color-system-tertiary);
+  
   --blur-apple: var(--blur-apple);
 }
 
