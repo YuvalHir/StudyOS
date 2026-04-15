@@ -8,6 +8,7 @@ import Assignments from '@/components/Assignments/Assignments';
 import Resources from '@/components/Resources/Resources';
 import Courses from '@/components/Courses/Courses';
 import CourseFocus from '@/components/Courses/CourseFocus';
+import Settings from '@/components/Settings/Settings';
 import Search from '@/components/Search/Search';
 import QuickActions from '@/components/QuickActions';
 import ResourceViewer from '@/components/ui/ResourceViewer';
@@ -28,14 +29,15 @@ import {
   X,
   Bell,
   Edit2,
-  Check
+  Check,
+  Settings as SettingsIcon
 } from 'lucide-react';
 
 interface AppClientProps {
   session: Session | null;
 }
 
-type TabType = 'dashboard' | 'schedule' | 'assignments' | 'resources' | 'courses' | 'course-focus';
+type TabType = 'dashboard' | 'schedule' | 'assignments' | 'resources' | 'courses' | 'course-focus' | 'settings';
 
 export default function AppClient({ session: initialSession }: AppClientProps) {
   const [session, setSession] = useState<Session | null>(initialSession);
@@ -165,6 +167,7 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
     { id: 'schedule', label: t('schedule'), icon: <Calendar size={18} /> },
     { id: 'assignments', label: t('assignments'), icon: <FileText size={18} /> },
     { id: 'resources', label: t('resources'), icon: <Folder size={18} /> },
+    { id: 'settings', label: t('settings'), icon: <SettingsIcon size={18} /> },
   ];
 
   return (
@@ -328,6 +331,13 @@ export default function AppClient({ session: initialSession }: AppClientProps) {
             {currentTab === 'courses' && <Courses onCourseFocus={(id) => switchTab('course-focus', id)} />}
             {currentTab === 'course-focus' && selectedCourseId && (
               <CourseFocus courseId={selectedCourseId} onBack={() => setCurrentTab('courses')} />
+            )}
+            {currentTab === 'settings' && (
+              <Settings 
+                fullName={fullName} 
+                email={session.user.email || ''} 
+                onUpdateProfile={(name) => setFullName(name)} 
+              />
             )}
           </div>
         </main>
