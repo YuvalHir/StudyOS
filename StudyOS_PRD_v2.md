@@ -80,7 +80,8 @@ Tenant (= one student workspace)
 | **ORM** | Drizzle | **Drizzle** (unchanged) | Supports both SQLite + PostgreSQL |
 | **File Storage** | Local FS | **Cloudflare R2** (S3-compatible) | Cheap, no egress fees, global CDN |
 | **Auth** | Custom JWT | **Supabase Auth** or **Clerk** | Multi-tenant sessions, social login, magic link |
-| **Backend** | Hono + Node.js | **Hono + Node.js** (unchanged) | Add tenant middleware |
+| **Backend** | Hono + Node.js | **Hono + Node.js** (unchanged) | Add tenant proxy (formerly middleware) |
+| **Edge Logic** | Middleware | **Proxy** | Renamed `middleware.ts` to `proxy.ts` per Next.js v16+ convention |
 | **Frontend** | React + Vite | **React + Vite** (unchanged) | Add i18next + RTL CSS |
 | **Cache / Rate limit** | None | **Upstash Redis** | Per-tenant rate limiting, session cache |
 | **Deploy** | docker-compose | **Docker + Easypanel** or **Railway/Fly.io** | Zero-downtime deploys, auto-scaling |
