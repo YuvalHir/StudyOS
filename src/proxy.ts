@@ -45,14 +45,15 @@ export async function proxy(request: NextRequest) {
   supabaseResponse.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   supabaseResponse.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   
-  // Strict Content Security Policy (Adjusted for Supabase/Next.js)
+  // Relaxed Content Security Policy to allow necessary external resources
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval';
-    style-src 'self' 'unsafe-inline';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     img-src 'self' blob: data: https://*.supabase.co;
-    font-src 'self' data:;
+    font-src 'self' data: https://fonts.gstatic.com;
     connect-src 'self' https://*.supabase.co wss://*.supabase.co;
+    frame-src 'self' blob: data:;
     frame-ancestors 'none';
     block-all-mixed-content;
     upgrade-insecure-requests;
