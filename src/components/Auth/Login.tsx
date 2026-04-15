@@ -48,7 +48,6 @@ const Login: React.FC = () => {
           password,
           options: {
             data: { 
-              tenant_id: crypto.randomUUID(),
               full_name: name || email.split('@')[0]
             }
           }
